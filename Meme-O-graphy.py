@@ -13,6 +13,7 @@ class MemeOGraphy :
         self.root = root
         self.menubar = tk.Menu(self.root)
         self.currentImageFilepath = None
+        self._setBackground(self.root,"bg.png")
         self._buildMenu()
         self._buildLayouts()
         self._buildWidgets()
@@ -29,30 +30,40 @@ class MemeOGraphy :
         self.root.config(menu=self.menubar)
 
     def _buildLayouts(self):
-        self.imagesFrame = ctk.CTkFrame(self.root,border_color="grey",border_width=2,corner_radius=5)
-        self.imagesFrame.grid(row=1,column=1,padx=5,pady=5)
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
+        self.root.grid_rowconfigure(2, weight=1)
+
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_columnconfigure(1, weight=1)
+
+        self.imagesFrame = ctk.CTkFrame(self.root,border_color="grey",border_width=2,corner_radius=2)
+        self.imagesFrame.grid(row=1,column=1,padx=5,pady=5,sticky = "")
         self.imagesFrame.grid_remove()
 
-        self.dataFrame = ctk.CTkFrame(self.root,border_color="grey",border_width=2,corner_radius=5)
-        self.dataFrame.grid(row=1,column=0,padx=5,pady=5,sticky= "nw")
+        self.dataFrame = ctk.CTkFrame(self.root,border_color="grey",border_width=2,corner_radius=2)
+        self.dataFrame.grid(row=1,column=0,padx=5,pady=5,sticky= "")
 
-        self.encryptionFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
+        self.encryptionFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=2)
         self.encryptionFrame.grid(row=1,column=0,padx=5,pady=5)
         self.encryptionFrame.grid_remove()
 
-        self.decryptionFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
+        self.decryptionFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=2)
         self.decryptionFrame.grid(row=1,column=0,padx=5,pady=5)
         self.decryptionFrame.grid_remove()
 
-        self.outputFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
+        self.outputFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=2)
         self.outputFrame.grid(row=0,column=1,padx=5,pady=5,rowspan=2)
 
-        self.keyCreationFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
+        self.keyCreationFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=2)
         self.keyCreationFrame.grid(row=1,column=0,padx=5,pady=5)
 
     def _buildWidgets(self):
-        title = ctk.CTkLabel(self.root, text = "Meme-O-Graphy",font=("Arial",20))
-        title.grid(row = 0,column = 0,columnspan = 2,sticky = "ew",padx = 5,pady = 5)
+        box = ctk.CTkFrame(self.root,border_width =2,corner_radius =2,border_color="red")
+        box.grid(row=0,column=0,columnspan=2,sticky="n",padx=5,pady=5)
+        title = ctk.CTkLabel(box, text = "Meme-O-Graphy",font=("Comic Sans MS",40),corner_radius=5)
+        title.grid(row = 0,column = 0)
+    
         #method
         self.encryptionMethod = ctk.CTkOptionMenu(self.dataFrame,values=encryptionMethods)
         self.encryptionMethod.grid(row=0,column=0,padx=5,pady=5)
@@ -137,12 +148,10 @@ class MemeOGraphy :
 
         self.image.configure(image=img_tk)
         self.image.image = img_tk
-
     def _updateOutput(self,msg):
         self.outputDecryption.configure(state ="normal")
         self.outputDecryption.insert("0.0",msg)
         self.outputDecryption.configure(state="disabled")
-
     def _verifyImage(self):
         if  not self.image.cget("image"):
             self._updateOutput("no image\n")
@@ -179,7 +188,6 @@ class MemeOGraphy :
 
         self.initCryption.configure(state="normal")
         self.inputCryption.configure(state="normal")
-        
     def _initDecryption(self) :
         self.outputDecryption.configure(state ="normal")
         self.outputDecryption.delete("1.0","end")
@@ -187,6 +195,38 @@ class MemeOGraphy :
 
         self._updateOutput("We're no strangers to love You know the rules and so do I A full commitment's what I'm thinking of You wouldn't get this from any other guy I just wanna tell you how I'm feeling Gotta make you understand Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you We've known each other for so long Your heart's been aching, but you're too shy to say it Inside, we both know what's been going on We know the game and we're gonna play it And if you ask me how I'm feeling Don't tell me you're too blind to see Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you (Ooh, give you up) (Ooh, give you up) Never gonna give, never gonna give (Give you up) Never gonna give, never gonna give (Give you up) We've known each other for so long Your heart's been aching, but you're too shy to say it Inside, we both know what's been going on We know the game and we're gonna play it I just wanna tell you how I'm feeling Gotta make you understand Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you")
 
+    def _setBackground(self,container, image_path, keep_aspect=True):
+
+        container.update_idletasks()
+        W = max(1, container.winfo_width())
+        H = max(1, container.winfo_height())
+
+        pil = Image.open(image_path).convert("RGB")
+
+        def _fit_size(img, w, h):
+            if not keep_aspect:
+                return (w, h)
+            iw, ih = img.size
+            s = min(w/iw, h/ih) if iw and ih else 1
+            return (max(1, int(iw*s)), max(1, int(ih*s)))
+
+        size = _fit_size(pil, W, H)
+        bg_img = ctk.CTkImage(light_image=pil, dark_image=pil, size=size)
+        bg_lbl = ctk.CTkLabel(container, text="", image=bg_img)
+        bg_lbl.place(relx=0, rely=0, relwidth=1, relheight=1)
+        bg_lbl.lower()
+        container._bg_pil = pil
+        container._bg_img = bg_img
+        container._bg_lbl = bg_lbl
+        def _on_resize(_=None):
+            w = max(1, container.winfo_width())
+            h = max(1, container.winfo_height())
+            new_size = _fit_size(container._bg_pil, w, h)
+            container._bg_img.configure(size=new_size)
+
+        container.bind("<Configure>", _on_resize)
+        return bg_lbl
+    
 
 if __name__ == '__main__':
     ctk.set_appearance_mode("dark")
