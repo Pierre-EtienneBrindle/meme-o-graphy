@@ -122,9 +122,21 @@ class MemeOGraphy :
     
     def _updateImage(self,filepath):
         self.imagesFrame.configure(border_color = "grey")
+        
         img_pil = Image.open(filepath)
+
+        frame_w = self.root.winfo_width()/2 or 1
+        frame_h = self.root.winfo_height()/2 or 1
+
+        ratio = min(frame_w / img_pil.width, frame_h / img_pil.height)
+        new_w = int(img_pil.width * ratio)
+        new_h = int(img_pil.height * ratio)
+
+        img_pil = img_pil.resize((new_w, new_h), Image.LANCZOS)
         img_tk = ImageTk.PhotoImage(img_pil)
-        self.image.configure(image = img_tk)
+
+        self.image.configure(image=img_tk)
+        self.image.image = img_tk
 
     def _updateOutput(self,msg):
         self.outputDecryption.configure(state ="normal")
