@@ -1,4 +1,5 @@
 class CryptoTool():
+
     def encrypt(self, message : str, key : bytes) -> bytes:
         """Encrypts the message
 
