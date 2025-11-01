@@ -9,6 +9,7 @@ class CryptoTool():
         Returns:
             bytes: The encrypted message as a byte array
         """
+        assert False #Stops if the tool is incomplete
 
     def decrypt(self, encrypted : bytes, key : bytes) -> str:
         """Decrypts a message
@@ -20,6 +21,7 @@ class CryptoTool():
         Returns:
             str: The message decrypted
         """
+        assert False #Stops if the tool is incomplete
 
     def generateKeyPair()-> tuple[bytes, bytes]:
         """Generate the key pair
@@ -28,3 +30,4 @@ class CryptoTool():
             tuple[bytes, bytes]: The key generated. 
             Key[0] = private key, Key[1] => public key
         """
+        assert False #Stops if the tool is incomplete
