@@ -3,7 +3,7 @@ from tkinter import filedialog, messagebox
 import os
 from PIL import Image, ImageTk
 
-formats = [".png",".gif",".jpeg",".bmp",".webp"]
+formats = [".png",".gif",".jpg",".bmp",".webp"]
 encryptionMethods = ["RSA","autres"]
 class MemeOGraphy :
     def __init__(self,root):
@@ -47,10 +47,7 @@ class MemeOGraphy :
         self.encryptionMethod = ctk.CTkOptionMenu(self.imagesFrame,values=encryptionMethods)
         self.encryptionMethod.grid(row=0,column=0,padx=5,pady=5)
 
-        self.progressBar = ctk.CTkProgressBar(self.outputFrame)
-        self.progressBar.grid(row=1,column=0,padx=5,pady=5)
-
-        self.outputDecryption = ctk.CTkTextbox(self.outputFrame, width = 90, corner_radius = 5)
+        self.outputDecryption = ctk.CTkTextbox(self.outputFrame, width = 200, corner_radius = 5)
         self.outputDecryption.grid(row = 0, column = 0, padx=5,pady=5,sticky="nsew")
         self.outputDecryption.configure(state="disabled")
 
@@ -74,13 +71,16 @@ class MemeOGraphy :
         self.image.configure(image = img_tk)
 
     def _initCryption(self) :
+        self.initCryption.configure(state="disabled")
         self.inputCryption.configure(state="disabled")
-        entry = self.inputCryption.get()
-        #pierreEtienneBrindle(entry)
         self.outputDecryption.configure(state="normal")
         self.outputDecryption.delete("1.0", "end")
         self.outputDecryption.insert("0.0", "Cryption started")
         self.outputDecryption.configure(state="disabled")
+        entry = self.inputCryption.get()
+        #pierreEtienneBrindle(entry)
+        self.initCryption.configure(state="normal")
+        self.inputCryption.configure(state="normal")
 
         
         
