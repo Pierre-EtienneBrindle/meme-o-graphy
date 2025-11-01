@@ -2,13 +2,18 @@ from PIL.Image import Image as PILImage
 
 class Image(PILImage):
     def __init__(self):
-        pass
+        super().__init__()
+
+    @staticmethod
+    def fromPILImage(image: PILImage) -> Self:
+        image.__class__ = Image
+        return image
 
     def getFreeSpace(self) -> int:
-        pass
+        raise NotImplemented
 
     def encode(self, bits: bytes):
-        pass
+        raise NotImplemented
 
     def decode(self) -> bytes:
-        pass
+        raise NotImplemented
