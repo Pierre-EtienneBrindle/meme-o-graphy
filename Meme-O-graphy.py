@@ -1,55 +1,110 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
+import tkinter as tk
 import os
 from PIL import Image, ImageTk
 
+
 formats = [".png",".gif",".jpg",".bmp",".webp"]
 encryptionMethods = ["RSA","autres"]
+
 class MemeOGraphy :
     def __init__(self,root):
         self.root = root
+        self.menubar = tk.Menu(self.root)
+        self.currentImageFilepath = None
+        self._buildMenu()
         self._buildLayouts()
         self._buildWidgets()
         self.root.mainloop()
     
+    def _buildMenu(self):
+        self.menu = tk.Menu(self.menubar,tearoff=0,font=("Inter",12))
+        self.menu.add_command(label="Create Key",command=lambda: self._changeLayout(0))
+        self.menu.add_separator()
+        self.menu.add_command(label="Encryption",command=lambda: self._changeLayout(1))
+        self.menu.add_separator()
+        self.menu.add_command(label="Decryption",command=lambda : self._changeLayout(2))
+        self.menubar.add_cascade(label="Pages", menu=self.menu,font=("Inter",14))
+        self.root.config(menu=self.menubar)
+
     def _buildLayouts(self):
         self.imagesFrame = ctk.CTkFrame(self.root,border_color="grey",border_width=2,corner_radius=5)
         self.imagesFrame.grid(row=1,column=1,padx=5,pady=5)
+        self.imagesFrame.grid_remove()
 
         self.dataFrame = ctk.CTkFrame(self.root,border_color="grey",border_width=2,corner_radius=5)
         self.dataFrame.grid(row=1,column=0,padx=5,pady=5,sticky= "nw")
 
-        self.outputFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
-        self.outputFrame.grid(row=0,column=1,padx=5,pady=5)
+        self.encryptionFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
+        self.encryptionFrame.grid(row=1,column=0,padx=5,pady=5)
+        self.encryptionFrame.grid_remove()
 
-        self.argumentsFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
-        self.argumentsFrame.grid(row=0,column=0,padx=5,pady=5)
+        self.decryptionFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
+        self.decryptionFrame.grid(row=1,column=0,padx=5,pady=5)
+        self.decryptionFrame.grid_remove()
+
+        self.outputFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
+        self.outputFrame.grid(row=0,column=1,padx=5,pady=5,rowspan=2)
+
+        self.keyCreationFrame = ctk.CTkFrame(self.dataFrame,border_color="grey",border_width=2,corner_radius=5)
+        self.keyCreationFrame.grid(row=1,column=0,padx=5,pady=5)
 
     def _buildWidgets(self):
         title = ctk.CTkLabel(self.root, text = "Meme-O-Graphy",font=("Arial",20))
         title.grid(row = 0,column = 0,columnspan = 2,sticky = "ew",padx = 5,pady = 5)
+        #method
+        self.encryptionMethod = ctk.CTkOptionMenu(self.dataFrame,values=encryptionMethods)
+        self.encryptionMethod.grid(row=0,column=0,padx=5,pady=5)
 
+        #image box
         self.imageSelection = ctk.CTkButton(self.imagesFrame,text = "Select image",command = self._selectImage)
-        self.imageSelection.grid(row = 0,column=1,padx=5,pady=5,sticky= "n")
-
+        self.imageSelection.grid(row = 0,column=0,columnspan = 2,padx=5,pady=5)
         self.image = ctk.CTkLabel(self.imagesFrame,text = "")
         self.image.grid(row=1,column = 0,columnspan=2,padx = 5,pady = 5)
 
-        self.inputCryption = ctk.CTkEntry(self.argumentsFrame, placeholder_text = "Enter message")
-        self.inputCryption.grid(row = 0,column = 0,padx = 5,pady = 5,sticky ="nw")
+        #key creation
+        self.createKey = ctk.CTkButton(self.keyCreationFrame,text = "Generate key",command=self._generateKey)
+        self.createKey.grid(row=0,column=0,padx=5,pady=5)
 
-        self.initCryption = ctk.CTkButton(self.argumentsFrame,text = "Encrypt message",command = self._initCryption)
+        #encryption
+        self.inputCryption = ctk.CTkEntry(self.encryptionFrame, placeholder_text = "Enter message")
+        self.inputCryption.grid(row = 2,column = 0,padx = 5,pady = 5,sticky ="nw")
+        self.initCryption = ctk.CTkButton(self.encryptionFrame,text = "Encrypt message",command = self._initCryption)
         self.initCryption.grid(row = 1,column = 0,padx = 5,pady = 5)
-
-        self.initDecryption = ctk.CTkButton(self.argumentsFrame,text = "Decrypt message",command = self._initDecryption)
+        
+        #decryption
+        self.initDecryption = ctk.CTkButton(self.decryptionFrame,text = "Decrypt message",command = self._initDecryption)
         self.initDecryption.grid(row = 2,column = 0,padx = 5,pady = 5)
 
-        self.encryptionMethod = ctk.CTkOptionMenu(self.imagesFrame,values=encryptionMethods)
-        self.encryptionMethod.grid(row=0,column=0,padx=5,pady=5)
-
+        #output
         self.outputDecryption = ctk.CTkTextbox(self.outputFrame, width = 200, corner_radius = 5)
         self.outputDecryption.grid(row = 0, column = 0, padx=5,pady=5,sticky="nsew")
         self.outputDecryption.configure(state="disabled")
+
+    def _generateKey(self):
+        self._updateOutput("Generating key")
+        algo = self.encryptionMethod.get()
+        #call code PE
+
+    def _changeLayout(self,layoutNb):
+        #most bs way to do this 
+        match layoutNb:
+            case 0:
+                self.imagesFrame.grid_remove()
+                self.decryptionFrame.grid_remove()
+                self.encryptionFrame.grid_remove()
+                self.keyCreationFrame.grid()
+            case 1:
+                self.imagesFrame.grid()
+                self.decryptionFrame.grid_remove()
+                self.keyCreationFrame.grid_remove()
+                self.encryptionFrame.grid()
+            case 2:
+                self.imagesFrame.grid()
+                self.encryptionFrame.grid_remove()
+                self.keyCreationFrame.grid_remove()
+                self.decryptionFrame.grid()
 
     def _selectImage(self):
         filepath = filedialog.askopenfilename()
@@ -61,34 +116,64 @@ class MemeOGraphy :
         if extension not in formats:
             messagebox.showerror(f"Invalid format", f'Select a {format} file')
             return
-
+        self.currentImageFilepath = filepath
         self.imageSelection.configure(text=os.path.basename(filepath))
         self._updateImage(filepath)
     
     def _updateImage(self,filepath):
+        self.imagesFrame.configure(border_color = "grey")
         img_pil = Image.open(filepath)
         img_tk = ImageTk.PhotoImage(img_pil)
         self.image.configure(image = img_tk)
 
+    def _updateOutput(self,msg):
+        self.outputDecryption.configure(state ="normal")
+        self.outputDecryption.insert("0.0",msg)
+        self.outputDecryption.configure(state="disabled")
+
+    def _verifyImage(self):
+        if  not self.image.cget("image"):
+            self._updateOutput("no image\n")
+            self.imagesFrame.configure(border_color = "red")
+            return False
+        else :
+            self.imagesFrame.configure(border_color = "grey")
+            return True
     def _initCryption(self) :
+        input = True
+        #clear output
+        self.outputDecryption.configure(state ="normal")
+        self.outputDecryption.delete("1.0","end")
+
+        #make sur an image is selected
+        image = self._verifyImage()
+        #make sure you input a message
+        if self.inputCryption.get() == "":
+            self._updateOutput("No message\n")
+            self.inputCryption.configure(border_color="red")
+            input =False
+        else : 
+             self.inputCryption.configure(border_color = "grey")
+        if not input or not image : return 
+        
         self.initCryption.configure(state="disabled")
         self.inputCryption.configure(state="disabled")
-        self.outputDecryption.configure(state="normal")
-        self.outputDecryption.delete("1.0", "end")
-        self.outputDecryption.insert("0.0", "Cryption started")
-        self.outputDecryption.configure(state="disabled")
-        entry = self.inputCryption.get()
-        #pierreEtienneBrindle(entry)
+        self._updateOutput("Cryption started")
+        
+        msg = self.inputCryption.get()
+        algo = self.encryptionMethod.get()
+        imgPath = self.currentImageFilepath
+        #call code PE
+
         self.initCryption.configure(state="normal")
         self.inputCryption.configure(state="normal")
-
-        
         
     def _initDecryption(self) :
-        self.outputDecryption.configure(state="normal")
-        self.outputDecryption.delete("1.0", "end")
-        self.outputDecryption.insert("0.0", "We're no strangers to love You know the rules and so do IA full commitment's what I'm thinking of You wouldn't get this from any other guy I just wanna tell you how I'm feeling Gotta make you understand Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you We've known each other for so long Your heart's been aching, but you're too shy to say it Inside, we both know what's been going on We know the game and we're gonna play it And if you ask me how I'm feeling Don't tell me you're too blind to see Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you (Ooh, give you up) (Ooh, give you up) Never gonna give, never gonna give (Give you up) Never gonna give, never gonna give (Give you up) We've known each other for so long Your heart's been aching, but you're too shy to say it Inside, we both know what's been going on We know the game and we're gonna play it I just wanna tell you how I'm feeling Gotta make you understand Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you")
-        self.outputDecryption.configure(state="disabled")
+        self.outputDecryption.configure(state ="normal")
+        self.outputDecryption.delete("1.0","end")
+        if not self._verifyImage() : return
+
+        self._updateOutput("We're no strangers to love You know the rules and so do I A full commitment's what I'm thinking of You wouldn't get this from any other guy I just wanna tell you how I'm feeling Gotta make you understand Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you We've known each other for so long Your heart's been aching, but you're too shy to say it Inside, we both know what's been going on We know the game and we're gonna play it And if you ask me how I'm feeling Don't tell me you're too blind to see Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you (Ooh, give you up) (Ooh, give you up) Never gonna give, never gonna give (Give you up) Never gonna give, never gonna give (Give you up) We've known each other for so long Your heart's been aching, but you're too shy to say it Inside, we both know what's been going on We know the game and we're gonna play it I just wanna tell you how I'm feeling Gotta make you understand Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you")
 
 
 if __name__ == '__main__':
