@@ -8,7 +8,7 @@ from Images.Image import Image
 from BitIterator import BitIterator
 from math import ceil
 
-MAX_BLOCK_SIZE = 5
+MAX_BLOCK_SIZE = 3
 
 class ImageLossy(Image):
     def __init__(self):
