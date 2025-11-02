@@ -24,8 +24,7 @@ class EncodeTab(QWidget):
 
         self.display = QLabel()
         self.pixmap = QPixmap(os.path.join(script_dir, "welcome_broccoli.png"))
-        self.display.setPixmap(self.pixmap)
-        self.display.resize(200, 200)
+        self.display.setPixmap(self.pixmap.scaledToWidth(700))
 
         self.select_image_button = QPushButton("Select image")
         self.select_image_button.clicked.connect(self.selectImageButtonClicked)
@@ -44,8 +43,6 @@ class EncodeTab(QWidget):
 
         self.sign_checkbox = QCheckBox()
         self.sign_label = QLabel("Sign message")
-        self.encrypt_for_me_checkbox = QCheckBox()
-        self.encrypt_for_me_label = QLabel("Encrypt for me")
         self.recipients_label = QLabel("Select recipients")
         self.recipients_list = QComboBox()
         self.recipients_list.addItems(map(lambda x: x["uids"][0], gpg.list_keys()))
@@ -67,8 +64,6 @@ class EncodeTab(QWidget):
 
         self.layout.addWidget(self.sign_label, 0, 20, 1, 1)
         self.layout.addWidget(self.sign_checkbox, 0, 21, 1, 1)
-        self.layout.addWidget(self.encrypt_for_me_label, 1, 20, 1, 1)
-        self.layout.addWidget(self.encrypt_for_me_checkbox, 1, 21, 1, 1)
         self.layout.addWidget(self.recipients_label, 2, 20, 1, 1)
         self.layout.addWidget(self.recipients_list, 3, 20, 1, 4)
         self.layout.addWidget(self.select_recipient, 3, 24, 1, 1)
@@ -81,7 +76,7 @@ class EncodeTab(QWidget):
         self.selected_image_label.setText(os.path.basename(os.path.normpath(self.selected_image_path)))
 
         self.pixmap = QPixmap(self.selected_image_path)
-        self.display.setPixmap(self.pixmap)
+        self.display.setPixmap(self.pixmap.scaledToWidth(700))
 
     def selectInputFileButtonClicked(self):
         self.selected_file_path = QFileDialog.getOpenFileName(self, "Open file")[0]
@@ -103,11 +98,11 @@ class EncodeTab(QWidget):
     def encodeButtonClicked(self):
         errorMessage = []
         if self.selected_image_path == "":
-            errorMessage.append("no image selected")
+            errorMessage.append("no image selected\n")
         if self.outputed_file_path == "":
-            errorMessage.append("no output file path")
+            errorMessage.append("no output file path\n")
         if self.selected_file_path == "":
-            errorMessage.append("no selected file path")
+            errorMessage.append("no selected file path\n")
 
         if len(errorMessage) != 0:
             popup = QMessageBox(self)
@@ -115,7 +110,7 @@ class EncodeTab(QWidget):
             msg = ""
             for message in errorMessage :
                 msg += message
-                
+
             popup.setText(msg)
             popup.setIcon(QMessageBox.Icon.Critical)
             popup.exec()
@@ -129,12 +124,13 @@ class EncodeTab(QWidget):
             recipients.append(self.selected_recipients_list.takeItem(0).text())
         self.selected_recipients_list.addItems(recipients)
 
-        result = gpg.encrypt(content, recipients=recipients, always_trust=True, armor=False)
+        result = gpg.encrypt(content, recipients=recipients, always_trust=True, armor=False, sign=self.sign_checkbox.isChecked())
         if result.ok:
             compressed_data = gzip.compress(result.data)
             image = ImageLossy.fromPILImage(Image.open(self.selected_image_path).copy())
             image = image.encode(compressed_data)
             image.save(self.outputed_file_path)
+
 
 class DecodeTab(QWidget):
     def __init__(self):
@@ -147,8 +143,7 @@ class DecodeTab(QWidget):
 
         self.display = QLabel()
         self.pixmap = QPixmap("/tmp/image.png")
-        self.display.setPixmap(self.pixmap)
-        self.display.resize(200, 200)
+        self.display.setPixmap(self.pixmap.scaledToWidth(700))
 
         self.select_image_button = QPushButton("Select image")
         self.select_image_button.clicked.connect(self.selectImageButtonClicked)
@@ -160,23 +155,22 @@ class DecodeTab(QWidget):
         self.outputed_file_label = QLabel("No file selected")
         self.outputed_file_path = ""
 
-      
         self.decode_button = QPushButton("Decode")
         self.decode_button.clicked.connect(self.decodeButtonClicked)
 
         self.layout.addWidget(self.select_image_button, 0, 0, 1, 1)
         self.layout.addWidget(self.selected_image_label, 0, 1, 1, 2)
-        self.layout.addWidget(self.output_file_button, 0, 6, 1, 1)
-        self.layout.addWidget(self.outputed_file_label, 0, 7, 1, 2)
+        self.layout.addWidget(self.output_file_button, 0, 3, 1, 1)
+        self.layout.addWidget(self.outputed_file_label, 0, 4, 1, 2)
+        self.layout.addWidget(self.decode_button, 0, 6, 1, 2)
         self.layout.addWidget(self.display, 1, 0, 19, 20)
-        self.layout.addWidget(self.decode_button, 13, 20, 1, 5)
 
     def selectImageButtonClicked(self):
         self.selected_image_path = QFileDialog.getOpenFileName(self, "Open file")[0]
         self.selected_image_label.setText(os.path.basename(os.path.normpath(self.selected_image_path)))
 
         self.pixmap = QPixmap(self.selected_image_path)
-        self.display.setPixmap(self.pixmap)
+        self.display.setPixmap(self.pixmap.scaledToWidth(700))
 
     def selectOutputFileButtonClicked(self):
         self.outputed_file_path = QFileDialog.getOpenFileName(self, "Open file")[0]
