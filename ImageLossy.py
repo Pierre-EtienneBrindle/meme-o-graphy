@@ -21,56 +21,31 @@ class ImageLossy(Image):
     def getFreeSpace(self) -> int:
         return prod(self.size) * len(self.getbands())
 
-    def encode(self, bytes_: bytes):
-        bitIterator = BitIterator(bytes_)
+    def encode(self, payLoad: bytes):
+        payLoad = len(payLoad).to_bytes(4, byteorder="big") + payLoad
+        bitIterator = BitIterator(payLoad)
         pixels = np.array(self)
-        total_0 = 0
+
+        maxBlockSize = np.floor(pixels.shape[1] * pixels.shape[0] * 3 / 8 / len(payLoad))
+        maxBlockSize = np.min(maxBlockSize, 5) #make sure the block aren't to great
+         
         for i in range(min(pixels.shape[2], 3)):
             freqs = np.fft.fftshift(pixels[:, :, i])
-            x_min = 0
-            x_max = pixels.shape[0] -1
-            y_min = 0
-            y_max = pixels.shape[1] - 1
-            delta = (1,0)
-            curr_pos = (-1,0)
-            for _ in range((pixels.shape[0] ) * (pixels.shape[1])):
-                next_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                if next_pos[0] < x_min and delta[0] < 0 : 
-                    delta = (-delta[1], delta[0])
-                    y_max -= 1
-                    curr_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                elif next_pos[0] > x_max and delta[0] > 0: 
-                    delta = (-delta[1], delta[0])
-                    y_min += 1
-                    curr_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                elif next_pos[1] < y_min and delta[1] < 0:
-                    delta = (-delta[1], delta[0])
-                    x_min += 1
-                    curr_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                elif next_pos[1] > y_max and delta[1] > 0: 
-                    delta = (-delta[1], delta[0])
-                    x_max -= 1
-                    curr_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                else :
-                    curr_pos = next_pos
-
-
-                freq = freqs[curr_pos[0], curr_pos[1]]
-                norm = np.linalg.norm(freq)
-                a = 2
-                try:
-                    to_add = next(bitIterator) * a / 2
-                    if norm == 0 : 
-                        total_0 += 1
-                        freq = to_add 
-                    else: 
-                        freq = freq / norm * (norm - (norm % a) + to_add)
-                except StopIteration:
-                    break
-                freqs[curr_pos[0], curr_pos[1]] = freq 
-            pixels[:, :, i] = np.fft.ifftshift(freqs) # Unchanged almost, diff of 10^-12
-            freqs2 = np.fft.fftshift(pixels[:, :, i])
-            diff = freqs - freqs2
+            for x in range(pixels.shape[0]):
+                for y in range(pixels.shape[1]):
+                    freq = freqs[x, y]
+                    norm = np.linalg.norm(freq)
+                    a = 2
+                    try:
+                        to_add = next(bitIterator) * a / 2
+                        if norm == 0 : 
+                            freq = to_add 
+                        else: 
+                            freq = freq / norm * (norm - (norm % a) + to_add)
+                    except StopIteration:
+                        break
+                    freqs[x, y] = freq 
+            pixels[:, :, i] = np.fft.ifftshift(freqs)
 
         return ImageLossy.fromPILImage(PIL.Image.fromarray(pixels))
 
@@ -80,49 +55,25 @@ class ImageLossy(Image):
         bits = []
         for i in range(min(pixels.shape[2], 3)):
             freqs = np.fft.fftshift(pixels[:, :, i])
-            x_min = 0
-            x_max = pixels.shape[0] -1
-            y_min = 0
-            y_max = pixels.shape[1] - 1
-            delta = (1,0)
-            curr_pos = (-1,0)
-            for _ in range((pixels.shape[0] ) * (pixels.shape[1])):
-                next_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                if next_pos[0] < x_min and delta[0] < 0 : 
-                    delta = (-delta[1], delta[0])
-                    y_max -= 1
-                    curr_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                elif next_pos[0] > x_max and delta[0] > 0: 
-                    delta = (-delta[1], delta[0])
-                    y_min += 1
-                    curr_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                elif next_pos[1] < y_min and delta[1] < 0:
-                    delta = (-delta[1], delta[0])
-                    x_min += 1
-                    curr_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                elif next_pos[1] > y_max and delta[1] > 0: 
-                    delta = (-delta[1], delta[0])
-                    x_max -= 1
-                    curr_pos = (curr_pos[0] + delta[0], curr_pos[1] + delta[1])
-                else :
-                    curr_pos = next_pos
-
-                freq = freqs[curr_pos[0], curr_pos[1]]
-                norm = np.linalg.norm(freq)
-                bits.append(round(norm) % 2)
-
+            for x in range(pixels.shape[0]):
+                for y in range(pixels.shape[1]):
+                    freq = freqs[x, y]
+                    norm = np.linalg.norm(freq)
+                    bits.append(round(norm) % 2)
         data = []
         for batch in batched(bits, 8):
             value = sum(v << i for i, v in enumerate(batch))
             data.append(value)
-
-        return bytes(data)
+        fileSize = int.from_bytes(data[0:4], byteorder= "big")
+        return bytes(data[4:fileSize + 4])
 
 
 if __name__ == "__main__":
-    test_image = ImageLossy.fromPILImage(PIL.Image.open("./c_change.png").copy())
-    #message = b"Allo" * 4000
-    #test_image = test_image.encode(b"Allo" * 4000)
-    #test_image.save("./c_change.png")
+    test_image = ImageLossy.fromPILImage(PIL.Image.open("./bee-ception.png").copy())
+    #with open("test.txt", "r") as file :
+        #text = file.read()
+        #message = text.encode("utf-8")
+    #test_image = test_image.encode(message)
+    #test_image.save("./bee-ception.png")
     data = test_image.decode()
-    print(data[0:4000 * 4].decode("utf-8"))
+    print(data.decode("utf-8"))
