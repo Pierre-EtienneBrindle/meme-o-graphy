@@ -130,7 +130,7 @@ class EncodeTab(QWidget):
         result = gpg.encrypt(content, recipients=recipients, always_trust=True, armor=False)
         if result.ok:
             compressed_data = gzip.compress(result.data)
-            image = ImageLossy.fromPILImage(Image.open(self.selected_image_path))
+            image = ImageLossy.fromPILImage(Image.open(self.selected_image_path).copy())
             image = image.encode(compressed_data)
             image.save(self.outputed_file_path)
 
@@ -185,14 +185,17 @@ class DecodeTab(QWidget):
         if self.selected_image_path == "" or self.outputed_file_path == "" :
             return
 
-        image = ImageLossy.fromPILImage(Image.open(self.selected_image_path))
+        image = ImageLossy.fromPILImage(Image.open(self.selected_image_path).copy())
         data = image.decode()
-        decrypted_data = gpg.decrypt(data)
+        decompressed_data = gzip.decompress(data)
 
-        decompresed_data = gzip.decompress(decrypted_data)
+        decrypted_data = gpg.decrypt(decompressed_data)
+        if decrypted_data.ok == False:
+            print("alert!!!")
+            return
 
-        with open(self.outputed_file_path, "w") as file :
-            file.write(decompresed_data)
+        with open(self.outputed_file_path, "wb") as file :
+            file.write(decrypted_data.data)
 
 
 
