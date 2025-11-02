@@ -4,7 +4,7 @@ from math import prod
 import numpy as np
 
 import PIL
-from Image import Image
+from Images.Image import Image
 from BitIterator import BitIterator
 from nToNSquare import coordonneesChemin
 from math import ceil
@@ -202,13 +202,4 @@ class ImageLossy(Image):
             data.append(value)
         fileSize = int.from_bytes(data[0:4], byteorder= "big")
         return bytes(data[4:fileSize + 4])
-
-if __name__ == "__main__":
-    test_image = ImageLossy.fromPILImage(PIL.Image.open("./b.webp").copy())
-    with open("test.txt", "r") as file :
-        text = file.read()
-        message = text.encode("utf-8")
-    test_image = test_image.encode(message)
-    test_image.save("./bee-ception.png")
-    data = test_image.decode()
-    print(data.decode("utf-8"))
+    

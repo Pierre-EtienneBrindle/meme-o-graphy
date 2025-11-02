@@ -4,7 +4,7 @@ from math import prod
 
 from PIL.Image import Image as PILImage
 
-from Image import Image
+from Images.Image import Image
 from BitIterator import BitIterator
 
 
