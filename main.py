@@ -2,7 +2,7 @@ import sys
 import os
 import gzip
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QTabWidget, QWidget, QCheckBox, QLabel, QComboBox, QFileDialog, QListWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QTabWidget, QWidget, QCheckBox, QLabel, QComboBox, QFileDialog,QListWidget, QMessageBox
 from PyQt6.QtGui import QPixmap
 from PIL import Image
 import gnupg
@@ -98,7 +98,16 @@ class EncodeTab(QWidget):
             self.selected_recipients_list.takeItem(self.selected_recipients_list.currentIndex().row())
 
     def encodeButtonClicked(self):
+        img = True
+        output = True
+        path = True
+    
         if self.selected_image_path == "" or self.outputed_file_path == "" or self.selected_image_path == "":
+            popup = QMessageBox(self)
+            popup.setWindowTitle("Warning")
+            popup.setText("watch tf out")
+            popup.setIcon(QMessageBox.Icon.Critical)
+            popup.exec()
             return
 
         with open(self.selected_file_path, "r") as file:
