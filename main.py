@@ -96,20 +96,20 @@ class EncodeTab(QWidget):
             self.selected_recipients_list.takeItem(self.selected_recipients_list.currentIndex().row())
 
     def encodeButtonClicked(self):
-        errorMessage = []
+        errorMessages = []
         if self.selected_image_path == "":
-            errorMessage.append("no image selected\n")
+            errorMessages.append("No image selected")
         if self.outputed_file_path == "":
-            errorMessage.append("no output file path\n")
+            errorMessages.append("No output file path")
         if self.selected_file_path == "":
-            errorMessage.append("no selected file path\n")
+            errorMessages.append("No selected file path")
+        if self.selected_recipients_list.count() == 0:
+            errorMessages.append("No recipients specified")
 
-        if len(errorMessage) != 0:
+        if errorMessages:
             popup = QMessageBox(self)
             popup.setWindowTitle("Warning")
-            msg = ""
-            for message in errorMessage :
-                msg += message
+            msg = "\n".join(errorMessages)
 
             popup.setText(msg)
             popup.setIcon(QMessageBox.Icon.Critical)
