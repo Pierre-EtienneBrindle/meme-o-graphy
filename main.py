@@ -148,6 +148,12 @@ class EncodeTab(QWidget):
     def doNothingCheckboxClicked(self):
         self.do_nothing_checkbox.setChecked(True)
 
+        popup = QMessageBox(self)
+        popup.setWindowTitle("Non")
+        popup.setText("Non")
+        popup.setIcon(QMessageBox.Icon.Critical)
+        popup.exec()
+
 
 class DecodeTab(QWidget):
     def __init__(self):
