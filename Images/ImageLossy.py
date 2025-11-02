@@ -6,7 +6,6 @@ import numpy as np
 import PIL
 from Images.Image import Image
 from BitIterator import BitIterator
-from nToNSquare import coordonneesChemin
 from math import ceil
 
 MAX_BLOCK_SIZE = 5
