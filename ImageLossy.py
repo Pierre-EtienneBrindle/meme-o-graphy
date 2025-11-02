@@ -9,6 +9,7 @@ from BitIterator import BitIterator
 from nToNSquare import coordonneesChemin
 from math import ceil
 
+MAX_BLOCK_SIZE = 5
 
 class ImageLossy(Image):
     def __init__(self):
@@ -30,7 +31,7 @@ class ImageLossy(Image):
         numColor = min(pixels.shape[2], 3)
         numBlockPerColor = ceil(8 * len(payLoad) / numColor)
         blockSize = ((pixels.shape[1] )* (pixels.shape[0]))  // numBlockPerColor
-        blockSize = min(blockSize, 5) #make sure the block aren't to great
+        blockSize = min(blockSize, MAX_BLOCK_SIZE) #make sure the block aren't to great
 
         allFreqs = []
         for i in range(min(pixels.shape[2], 3)):
@@ -139,7 +140,7 @@ class ImageLossy(Image):
             allFreqs.append(np.fft.fftshift(pixels[:, :, i]))
 
         #Finds the block's size
-        blockSize = 5 #Assume the blocksize is maximal
+        blockSize = MAX_BLOCK_SIZE #Assume the blocksize is maximal
         for i in range(numColor):
             j = 1
             currNorm = np.linalg.norm(allFreqs[i][0,0])
