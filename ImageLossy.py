@@ -7,6 +7,7 @@ import PIL
 from Image import Image
 from BitIterator import BitIterator
 from nToNSquare import coordonneesChemin
+import cv2
 
 
 class ImageLossy(Image):
@@ -22,6 +23,9 @@ class ImageLossy(Image):
         return prod(self.size) * len(self.getbands())
 
     def encode(self, bytes_: bytes):
+        img_bgr = cv2.imread()
+
+        return 
         bitIterator = BitIterator(bytes_)
         pixels = np.array(self)
         for i in range(min(pixels.shape[2], 3)):
