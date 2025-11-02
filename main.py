@@ -183,11 +183,23 @@ class DecodeTab(QWidget):
 
         image = ImageLossy.fromPILImage(Image.open(self.selected_image_path).copy())
         data = image.decode()
-        decompressed_data = gzip.decompress(data)
+        try:
+            decompressed_data = gzip.decompress(data)
+        except gzip.BadGzipFile:
+            popup = QMessageBox(self)
+            popup.setWindowTitle("Warning")
+            popup.setText("No data found inside the image")
+            popup.setIcon(QMessageBox.Icon.Critical)
+            popup.exec()
+            return
 
         decrypted_data = gpg.decrypt(decompressed_data)
         if decrypted_data.ok == False:
-            print("alert!!!")
+            popup = QMessageBox(self)
+            popup.setWindowTitle("Warning")
+            popup.setText(f"Couldn't decrypt the data inside the image: {decrypted_data.status}")
+            popup.setIcon(QMessageBox.Icon.Critical)
+            popup.exec()
             return
 
         with open(self.outputed_file_path, "wb") as file :
