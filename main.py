@@ -152,7 +152,7 @@ class DecodeTab(QWidget):
         self.setLayout(self.layout)
 
         self.display = QLabel()
-        self.pixmap = QPixmap("/tmp/image.png")
+        self.pixmap = QPixmap(os.path.join(script_dir, "welcome_broccoli.png"))
         self.display.setPixmap(self.pixmap.scaledToWidth(700))
 
         self.select_image_button = QPushButton("Select image")
