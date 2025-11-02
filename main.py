@@ -10,6 +10,8 @@ import gnupg
 
 
 gpg = gnupg.GPG()
+script_dir = os.path.dirname(__file__)
+print(script_dir)
 
 class EncodeTab(QWidget):
     def __init__(self):
@@ -21,7 +23,7 @@ class EncodeTab(QWidget):
         self.setLayout(self.layout)
 
         self.display = QLabel()
-        self.pixmap = QPixmap("/tmp/image.png")
+        self.pixmap = QPixmap(os.path.join(script_dir, "welcome_broccoli.png"))
         self.display.setPixmap(self.pixmap)
         self.display.resize(200, 200)
 
