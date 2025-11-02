@@ -41,6 +41,11 @@ class EncodeTab(QWidget):
         self.outputed_file_label = QLabel("No file selected")
         self.outputed_file_path = ""
 
+        self.do_nothing_checkbox = QCheckBox()
+        self.do_nothing_checkbox.setChecked(True)
+        self.do_nothing_checkbox.clicked.connect(self.doNothingCheckboxClicked)
+        self.do_nothing_label = QLabel("Do nothing (default behavior)")
+
         self.sign_checkbox = QCheckBox()
         self.sign_label = QLabel("Sign message")
         self.recipients_label = QLabel("Select recipients")
@@ -64,6 +69,8 @@ class EncodeTab(QWidget):
 
         self.layout.addWidget(self.sign_label, 0, 20, 1, 1)
         self.layout.addWidget(self.sign_checkbox, 0, 21, 1, 1)
+        self.layout.addWidget(self.do_nothing_label, 1, 20, 1, 1)
+        self.layout.addWidget(self.do_nothing_checkbox, 1, 21, 1, 1)
         self.layout.addWidget(self.recipients_label, 2, 20, 1, 1)
         self.layout.addWidget(self.recipients_list, 3, 20, 1, 4)
         self.layout.addWidget(self.select_recipient, 3, 24, 1, 1)
@@ -130,6 +137,9 @@ class EncodeTab(QWidget):
             image = ImageLossy.fromPILImage(Image.open(self.selected_image_path).copy())
             image = image.encode(compressed_data)
             image.save(self.outputed_file_path)
+
+    def doNothingCheckboxClicked(self):
+        self.do_nothing_checkbox.setChecked(True)
 
 
 class DecodeTab(QWidget):
@@ -204,8 +214,6 @@ class DecodeTab(QWidget):
 
         with open(self.outputed_file_path, "wb") as file :
             file.write(decrypted_data.data)
-
-
 
 
 class MainWindow(QMainWindow):
