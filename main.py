@@ -138,6 +138,13 @@ class EncodeTab(QWidget):
             image = image.encode(compressed_data)
             image.save(self.outputed_file_path)
 
+        popup = QMessageBox(self)
+        popup.setWindowTitle("Encoding succeeded")
+        popup.setText("Encoding succeeded")
+        popup.setIcon(QMessageBox.Icon.Information)
+        popup.exec()
+
+
     def doNothingCheckboxClicked(self):
         self.do_nothing_checkbox.setChecked(True)
 
@@ -214,6 +221,12 @@ class DecodeTab(QWidget):
 
         with open(self.outputed_file_path, "wb") as file :
             file.write(decrypted_data.data)
+
+        popup = QMessageBox(self)
+        popup.setWindowTitle("Decoding succeeded")
+        popup.setText("Decoding succeeded")
+        popup.setIcon(QMessageBox.Icon.Information)
+        popup.exec()
 
 
 class MainWindow(QMainWindow):
