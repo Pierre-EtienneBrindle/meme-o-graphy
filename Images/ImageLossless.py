@@ -4,7 +4,7 @@ from math import prod
 
 from PIL.Image import Image as PILImage
 
-from Image import Image
+from Images.Image import Image
 from BitIterator import BitIterator
 
 
@@ -20,8 +20,8 @@ class ImageLossless(Image):
     def getFreeSpace(self) -> int:
         return prod(self.size) * len(self.getbands())
 
-    def encode(self, bits: bytes):
-        bitIterator = BitIterator(bits)
+    def encode(self, bytes_: bytes):
+        bitIterator = BitIterator(bytes_)
         for x in range(self.size[0]):
             for y in range(self.size[1]):
                 for c in range(len(self.getbands())):

@@ -1,4 +1,7 @@
+from typing import Self
+
 from PIL.Image import Image as PILImage
+
 
 class Image(PILImage):
     def __init__(self):
