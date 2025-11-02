@@ -188,6 +188,7 @@ class MemeOGraphy :
 
         self.initCryption.configure(state="normal")
         self.inputCryption.configure(state="normal")
+        
     def _initDecryption(self) :
         self.outputDecryption.configure(state ="normal")
         self.outputDecryption.delete("1.0","end")
